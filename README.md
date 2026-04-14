@@ -4,7 +4,12 @@
 
 ### ⚠️ Environment Variables
 - Create a `.env` file in the **backend** directory  
-- Add your local MySQL credentials there  
+- Add your local MySQL credentials there 
+ - DB_HOST=
+ - DB_PORT=
+ - DB_USER=
+ - DB_PASSWORD=
+ - DB_NAME= 
 
 ---
 
