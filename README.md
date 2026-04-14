@@ -5,11 +5,11 @@
 ### ⚠️ Environment Variables
 - Create a `.env` file in the **backend** directory  
 - Add your local MySQL credentials there 
- - DB_HOST=
- - DB_PORT=
- - DB_USER=
- - DB_PASSWORD=
- - DB_NAME= 
+  - DB_HOST=
+  - DB_PORT=
+  - DB_USER=
+  - DB_PASSWORD=
+  - DB_NAME= 
 
 ---
 
@@ -24,7 +24,7 @@ npm install
 ### Backend
 ```bash
 cd backend
-python3 -m venv venv
+python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
