@@ -1,32 +1,63 @@
-# readme in progress
+# README
 
-## relevant commands
+## Setup Instructions
 
-### please make sure you have/use your own .env file to connect to your local mysql
+### ⚠️ Environment Variables
+- Create a `.env` file in the **backend** directory  
+- Add your local MySQL credentials there  
 
-### setup frontend (do only once):
+---
+
+## Initial Setup (Run Once)
+
+### Frontend
+```bash
 cd frontend
 npm install
-npm run dev
+```
 
-### setup backend (do only once):
+### Backend
+```bash
 cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
 
-### run frontend
+---
+
+## Running the App
+
+### Start Frontend
+```bash
 cd frontend
 npm run dev
+```
 
-### run backend
+### Start Backend
+```bash
 cd backend
-python3 -m venv venv
 source venv/bin/activate
-uvicorn app.main:app --reload pyc
+uvicorn app.main:app --reload
+```
 
-### close frontend
-ctrl c
+---
 
-### close backend
+## Stopping the App
+
+### Stop Frontend
+```bash
+Ctrl + C
+```
+
+### Stop Backend
+```bash
 deactivate
+```
+
+---
+
+## Notes
+- Only run setup steps once  
+- Make sure MySQL is running locally  
+- Backend will fail if `.env` is not configured properly  
