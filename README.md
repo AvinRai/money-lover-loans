@@ -42,7 +42,8 @@ npm run dev
 ### Start Backend
 ```bash
 cd backend
-source venv/bin/activate
+for mac: source venv/bin/activate
+for windows: venv\Scripts\activate
 uvicorn app.main:app --reload
 ```
 
