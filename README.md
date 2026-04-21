@@ -20,22 +20,26 @@
 ## Environment Variables
 Create a `.env` file in the `backend` directory and add your MySQL credentials:
 
-DB_HOST=
+DB_HOST= 
+
 DB_PORT=
+
 DB_USER=
+
 DB_PASSWORD=
+
 DB_NAME=
 
 ---
 
 ## Initial Setup Commands
-# --- Frontend Setup ---
+### --- Frontend Setup ---
 ```bash
 cd frontend
 npm install
 ```
 
-# --- Backend Setup ---
+### --- Backend Setup ---
 ```bash
 cd backend
 python -m venv venv
@@ -49,7 +53,7 @@ pip install -r requirements.txt
 
 ## Run Commands
 
-# --- Run Backend ---
+### --- Run Backend ---
 ```bash
 cd backend
 for mac: source venv/bin/activate
@@ -57,7 +61,7 @@ for windows: venv\Scripts\activate
 uvicorn app.main:app --reload
 ```
 
-# --- Run Frontend ---
+### --- Run Frontend ---
 ```bash
 cd frontend
 npm run dev
@@ -67,12 +71,12 @@ npm run dev
 
 ## Stopping The Application
 
-# Stop Frontend
+### --- Stop Frontend---
 ```bash
 Ctrl + C
 ```
 
-# Stop Backend
+### --- Stop Backend ---
 ```bash
 deactivate
 ```
