@@ -26,6 +26,8 @@ DB_USER=
 DB_PASSWORD=
 DB_NAME=
 
+---
+
 ## Initial Setup Commands
 # --- Frontend Setup ---
 ```bash
@@ -43,6 +45,7 @@ for mac: source venv/bin/activate
 for windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
+---
 
 ## Run Commands
 
@@ -59,6 +62,8 @@ uvicorn app.main:app --reload
 cd frontend
 npm run dev
 ```
+
+---
 
 ## Stopping The Application
 
