@@ -37,9 +37,9 @@ CREATE TABLE LoanApplications(
     term_months INT NOT NULL,
     application_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status ENUM('pending', 'approved', 'denied') NOT NULL DEFAULT 'pending',
-    reviewed_by INT,
-    reviewed_at DATETIME,
-    denial_reason VARCHAR(255),
+    reviewed_by INT NOT NULL DEFAULT 0,
+    reviewed_at DATETIME NOT NULL DEFAULT '1000-01-01 00:00:00',
+    denial_reason VARCHAR(255) NOT NULL DEFAULT 'N/A',
 
     FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
     FOREIGN KEY (reviewed_by) REFERENCES Employees(employee_id),
