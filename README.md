@@ -49,6 +49,19 @@ for mac: source venv/bin/activate
 for windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
+
+### --- Database Setup ---
+```bash
+cd db
+mysql -u mll_user -p loaning_system < schema.sql
+mysql -u mll_user -p loaning_system < seed.sql
+
+To check:
+USE loaning_system;
+SHOW TABLES;
+SELECT * FROM customers;
+```
+
 ---
 
 ## Run Commands

@@ -12,9 +12,6 @@ CREATE TABLE Customers (
     balance DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     salary DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     credit_score INT NOT NULL,
-    approved_loans INT NOT NULL DEFAULT 0,
-    loan_applications INT NOT NULL DEFAULT 0,
-    total_debt DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     hashed_password VARCHAR(255) NOT NULL,
 
     CHECK(balance >= 0),
