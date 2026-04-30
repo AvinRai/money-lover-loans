@@ -7,9 +7,9 @@ VALUES
 ('Franklin', 'Du', 'franklinydu@gmail.com', '123-456-7890', 'San Jose, CA', 2.00, 1.00, 300, 'frank123');
 
 INSERT INTO Employees
-(employee_id, first_name, last_name, phone, address, hashed_password)
+(employee_id, first_name, last_name, email, phone, home_address, hashed_password)
 VALUES
-(0, 'Unreviewed', 'Application', 'N/A', 'N/A', 'N/A');
+(0, 'Unreviewed', 'Application', 'N/A', 'N/A', 'N/A', 'N/A');
 
 INSERT INTO employees
 (first_name, last_name, email, phone, home_address, hashed_password)
