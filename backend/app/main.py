@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from decimal import Decimal
-from app.db import fetch_all, fetch_one, execute, get_connection
+from app.db import fetch_all, fetch_one, execute
 
 app = FastAPI()
 
@@ -45,12 +45,49 @@ class PaymentCreate(BaseModel):
 class ReviewApplication(BaseModel):
     employee_id: int
     status: str
-    denial_reason: str | None = None
+    denial_reason: str
 
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+@app.post("/customer")
+def create_customer(customer: CustomerCreate):
+    existing = fetch_one(
+        """
+        SELECT customer_id FROM customers
+        WHERE email = %s
+        """,
+        (customer.email, )
+    )
+
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already exists")
+
+    customer_id = execute(
+        """
+        INSERT INTO customers
+        (first_name, last_name, email, phone, home_address, balance, salary, credit_score, hashed_password)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """,
+        (
+            customer.first_name,
+            customer.last_name,
+            customer.email,
+            customer.phone,
+            customer.home_address,
+            customer.balance,
+            customer.salary,
+            customer.credit_score,
+            customer.hashed_password
+        )
+    )
+
+    return {
+        "message": "Customer created successfully",
+        "customer_id": customer_id
+    }
 
 @app.get("/customers")
 def get_customers():
@@ -69,7 +106,7 @@ def get_customer(customer_id: int):
         FROM customers
         WHERE customer_id = %s 
         """,
-        (customer_id)
+        (customer_id, )
     )
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
