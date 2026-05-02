@@ -53,8 +53,11 @@ pip install -r requirements.txt
 ### --- Database Setup ---
 ```bash
 cd db
-mysql -u root -p loaning_system < schema.sql
-mysql -u root -p loaning_system < seed.sql
+mysql -u root -p
+CREATE DATABASE loaning_system;
+USE loaning_system;
+SOURCE schema.sql;
+SOURCE seed.sql;
 
 To check:
 USE loaning_system;
