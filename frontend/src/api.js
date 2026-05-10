@@ -141,3 +141,7 @@ export async function deleteLoan(loanId) {
     method: 'DELETE',
   })
 }
+
+export async function getPayments() {
+  return request('/payments')
+}

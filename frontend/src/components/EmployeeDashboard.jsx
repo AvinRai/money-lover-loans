@@ -5,6 +5,7 @@ import {
   getApplications,
   getCustomers,
   getLoans,
+  getPayments,
   patchApplicationReview,
   patchCustomer,
 } from '../api.js'
@@ -13,6 +14,7 @@ const TABS = [
   { id: 'applications', label: 'Applications' },
   { id: 'loans', label: 'Loans' },
   { id: 'customers', label: 'Customers' },
+  { id: 'payments', label: 'Payments' },
 ]
 
 const CUSTOMER_EDIT_FIELDS = [
@@ -31,6 +33,7 @@ export default function EmployeeDashboard({ session, onLogout }) {
   const [applications, setApplications] = useState([])
   const [loans, setLoans] = useState([])
   const [customers, setCustomers] = useState([])
+  const [payments, setPayments] = useState([])
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState(null)
   const [flash, setFlash] = useState(null)
@@ -52,14 +55,16 @@ export default function EmployeeDashboard({ session, onLogout }) {
   const refresh = useCallback(async () => {
     setLoading(true)
     try {
-      const [apps, ls, custs] = await Promise.all([
+      const [apps, ls, custs, pmts] = await Promise.all([
         getApplications(),
         getLoans(),
         getCustomers(),
+        getPayments(),
       ])
       setApplications(Array.isArray(apps) ? apps : [])
       setLoans(Array.isArray(ls) ? ls : [])
       setCustomers(Array.isArray(custs) ? custs : [])
+      setPayments(Array.isArray(pmts) ? pmts : [])
     } catch (e) {
       showFlash(e.message || 'Failed to load data', false)
     } finally {
@@ -418,6 +423,46 @@ export default function EmployeeDashboard({ session, onLogout }) {
                               Delete
                             </button>
                           </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ── Payments tab ── */}
+          {activeTab === 'payments' && (
+            <section className="card">
+              <h2>Payments</h2>
+              {payments.length === 0 ? (
+                <p className="subtle">None.</p>
+              ) : (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>payment_id</th>
+                        <th>customer</th>
+                        <th>loan_id</th>
+                        <th>payment_amount</th>
+                        <th>payment_date</th>
+                        <th>loan_balance_after</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {payments.map((r) => (
+                        <tr key={r.payment_id}>
+                          <td>{r.payment_id}</td>
+                          <td>
+                            {r.customer_first_name} {r.customer_last_name}{' '}
+                            <span className="subtle">(#{r.customer_id})</span>
+                          </td>
+                          <td>{r.loan_id}</td>
+                          <td>{formatMoney(r.payment_amount)}</td>
+                          <td>{formatDate(r.payment_date)}</td>
+                          <td>{formatMoney(r.loan_current_balance)}</td>
                         </tr>
                       ))}
                     </tbody>

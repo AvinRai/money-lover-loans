@@ -13,6 +13,7 @@ vi.mock('../api.js', () => ({
   getApplications: vi.fn(),
   getLoans: vi.fn(),
   getCustomers: vi.fn(),
+  getPayments: vi.fn(),
   patchApplicationReview: vi.fn(),
   patchCustomer: vi.fn(),
   deleteCustomer: vi.fn(),
@@ -23,6 +24,7 @@ import {
   getApplications,
   getLoans,
   getCustomers,
+  getPayments,
   patchApplicationReview,
   patchCustomer,
   deleteCustomer,
@@ -77,10 +79,22 @@ const CUSTOMER_ROW = {
   credit_score: 720,
 }
 
-function setupMocks({ apps = [], loans = [], customers = [] } = {}) {
+const PAYMENT_ROW = {
+  payment_id: 50,
+  loan_id: 20,
+  customer_id: 1,
+  customer_first_name: 'Alice',
+  customer_last_name: 'Smith',
+  payment_amount: '500.00',
+  payment_date: '2026-02-04T10:00:00',
+  loan_current_balance: '4000.00',
+}
+
+function setupMocks({ apps = [], loans = [], customers = [], payments = [] } = {}) {
   getApplications.mockResolvedValue(apps)
   getLoans.mockResolvedValue(loans)
   getCustomers.mockResolvedValue(customers)
+  getPayments.mockResolvedValue(payments)
 }
 
 beforeEach(() => {
@@ -100,13 +114,14 @@ describe('EmployeeDashboard – header and tabs', () => {
     expect(screen.getByText(/Employee #1/)).toBeTruthy()
   })
 
-  it('renders all three tab buttons', async () => {
+  it('renders all four tab buttons', async () => {
     setupMocks()
     render(<EmployeeDashboard session={SESSION} onLogout={vi.fn()} />)
     await waitFor(() => screen.getByText('Bob Jones'))
     expect(screen.getByRole('tab', { name: 'Applications' })).toBeTruthy()
     expect(screen.getByRole('tab', { name: 'Loans' })).toBeTruthy()
     expect(screen.getByRole('tab', { name: 'Customers' })).toBeTruthy()
+    expect(screen.getByRole('tab', { name: 'Payments' })).toBeTruthy()
   })
 
   it('calls onLogout when Log out clicked', async () => {
@@ -313,5 +328,88 @@ describe('EmployeeDashboard – Customers tab', () => {
     await waitFor(() => screen.getByRole('button', { name: /delete/i }))
     await userEvent.click(screen.getByRole('button', { name: /delete/i }))
     expect(deleteCustomer).not.toHaveBeenCalled()
+  })
+})
+
+describe('EmployeeDashboard – Payments tab', () => {
+  it('shows "None." on the Payments tab when there are no payments', async () => {
+    setupMocks()
+    render(<EmployeeDashboard session={SESSION} onLogout={vi.fn()} />)
+    await waitFor(() => screen.getByText('Bob Jones'))
+    await clickTab('Payments')
+    expect(screen.getByText('None.')).toBeTruthy()
+  })
+
+  it('calls getPayments on mount', async () => {
+    setupMocks({ payments: [PAYMENT_ROW] })
+    render(<EmployeeDashboard session={SESSION} onLogout={vi.fn()} />)
+    await waitFor(() => screen.getByText('Bob Jones'))
+    expect(getPayments).toHaveBeenCalledOnce()
+  })
+
+  it('renders a payment row with all key fields', async () => {
+    setupMocks({ payments: [PAYMENT_ROW] })
+    render(<EmployeeDashboard session={SESSION} onLogout={vi.fn()} />)
+    await waitFor(() => screen.getByText('Bob Jones'))
+    await clickTab('Payments')
+    await waitFor(() => expect(screen.getByText('Alice Smith')).toBeTruthy())
+    expect(screen.getByText('50')).toBeTruthy()   // payment_id
+    expect(screen.getByText('20')).toBeTruthy()   // loan_id
+  })
+
+  it('displays payment_amount formatted as currency', async () => {
+    setupMocks({ payments: [PAYMENT_ROW] })
+    render(<EmployeeDashboard session={SESSION} onLogout={vi.fn()} />)
+    await waitFor(() => screen.getByText('Bob Jones'))
+    await clickTab('Payments')
+    await waitFor(() => screen.getByText('Alice Smith'))
+    expect(screen.getByText(/\$500\.00/)).toBeTruthy()
+  })
+
+  it('displays loan_current_balance formatted as currency', async () => {
+    setupMocks({ payments: [PAYMENT_ROW] })
+    render(<EmployeeDashboard session={SESSION} onLogout={vi.fn()} />)
+    await waitFor(() => screen.getByText('Bob Jones'))
+    await clickTab('Payments')
+    await waitFor(() => screen.getByText('Alice Smith'))
+    expect(screen.getByText(/\$4,000\.00/)).toBeTruthy()
+  })
+
+  it('renders multiple payment rows', async () => {
+    const second = {
+      ...PAYMENT_ROW,
+      payment_id: 51,
+      loan_id: 21,
+      customer_first_name: 'Bob',
+      customer_last_name: 'Johnson',
+      customer_id: 2,
+      payment_amount: '1000.00',
+      loan_current_balance: '9000.00',
+    }
+    setupMocks({ payments: [PAYMENT_ROW, second] })
+    render(<EmployeeDashboard session={SESSION} onLogout={vi.fn()} />)
+    await waitFor(() => screen.getByText('Bob Jones'))
+    await clickTab('Payments')
+    await waitFor(() => screen.getByText('Alice Smith'))
+    expect(screen.getByText('Bob Johnson')).toBeTruthy()
+  })
+
+  it('displays the correct customer ID badge for each payment', async () => {
+    setupMocks({ payments: [PAYMENT_ROW] })
+    render(<EmployeeDashboard session={SESSION} onLogout={vi.fn()} />)
+    await waitFor(() => screen.getByText('Bob Jones'))
+    await clickTab('Payments')
+    await waitFor(() => screen.getByText('Alice Smith'))
+    expect(screen.getByText('(#1)')).toBeTruthy()
+  })
+
+  it('Payments tab is read-only – no action buttons rendered', async () => {
+    setupMocks({ payments: [PAYMENT_ROW] })
+    render(<EmployeeDashboard session={SESSION} onLogout={vi.fn()} />)
+    await waitFor(() => screen.getByText('Bob Jones'))
+    await clickTab('Payments')
+    await waitFor(() => screen.getByText('Alice Smith'))
+    expect(screen.queryByRole('button', { name: /delete/i })).toBeNull()
+    expect(screen.queryByRole('button', { name: /edit/i })).toBeNull()
   })
 })
