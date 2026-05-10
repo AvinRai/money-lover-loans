@@ -101,3 +101,43 @@ export async function postLoanPayment(loanId, body) {
     body: JSON.stringify(body),
   })
 }
+
+export async function login(role, email, password) {
+  return request('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ role, email, password }),
+  })
+}
+
+export async function postCustomer(body) {
+  return request('/customers', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+}
+
+export async function postEmployee(body) {
+  return request('/employees', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+}
+
+export async function patchCustomer(customerId, body) {
+  return request(`/customers/${customerId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  })
+}
+
+export async function deleteCustomer(customerId) {
+  return request(`/customers/${customerId}`, {
+    method: 'DELETE',
+  })
+}
+
+export async function deleteLoan(loanId) {
+  return request(`/loans/${loanId}`, {
+    method: 'DELETE',
+  })
+}

@@ -306,3 +306,141 @@ th {
   background: #ffebee;
   color: #b71c1c;
 }
+
+/* Outline button variant for landing page register actions */
+.btn-outline {
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-strong);
+  font-weight: 600;
+  cursor: pointer;
+  font: inherit;
+}
+
+.btn-outline:hover {
+  background: var(--bg-subtle);
+}
+
+/* Card header row: title + inline action button side-by-side */
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.card-header-row h2 {
+  margin-bottom: 0;
+}
+
+/* Two-column form row (e.g. first/last name) */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+/* Inline form action buttons row */
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.form-actions button[type='submit'] {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font: inherit;
+}
+
+.form-actions button[type='submit']:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Edit profile form inside a card */
+.edit-profile-form {
+  margin-top: 0.5rem;
+}
+
+/* Modal overlay + box for employee customer edit */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.modal-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.75rem;
+  max-width: 32rem;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.modal-box h2 {
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+
+/* Narrow register page — slightly wider than login */
+.narrow-page {
+  max-width: 28rem;
+}
+
+/* Tab navigation */
+.tab-nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+
+.tab-nav button {
+  padding: 0.55rem 1.1rem;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  border-radius: 0;
+  transition: color 0.15s;
+}
+
+.tab-nav button:hover:not(.active) {
+  color: var(--text-strong);
+  background: var(--bg-subtle);
+}
+
+.tab-nav button.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

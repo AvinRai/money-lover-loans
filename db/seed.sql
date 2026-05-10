@@ -7,11 +7,6 @@ VALUES
 ('Franklin', 'Du', 'franklinydu@gmail.com', '123-456-7890', 'San Jose, CA', 2.00, 1.00, 300, 'frank123');
 
 INSERT INTO Employees
-(employee_id, first_name, last_name, email, phone, home_address, hashed_password)
-VALUES
-(0, 'Unreviewed', 'Application', 'N/A', 'N/A', 'N/A', 'N/A');
-
-INSERT INTO employees
 (first_name, last_name, email, phone, home_address, hashed_password)
 VALUES
 ('Richard', 'Ho', 'richardho@gmail.com', '000-000-0000', 'Foster City, CA', 'richard123'),
@@ -22,3 +17,9 @@ INSERT INTO LoanApplications
 VALUES
 (1, 100, 3, 12, '2026-03-25', 'approved', 1, '2026-03-26', 'N/A'),
 (2, 2, 1, 24, '2026-03-26', 'denied', 2, '2026-03-27', 'Too broke');
+
+-- Create the active loan for Avin's approved application (application_id = 1)
+INSERT INTO Loans
+(application_id, customer_id, initial_balance, current_balance, interest_rate, loan_start_date, status)
+VALUES
+(1, 1, 100.00, 100.00, 3.00, '2026-03-26', 'active');

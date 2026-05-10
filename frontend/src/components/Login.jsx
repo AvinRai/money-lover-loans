@@ -1,55 +1,41 @@
-import { useEffect, useState } from 'react'
-import { getCustomer, getCustomers, getEmployee, getEmployees } from '../api.js'
+import { useState } from 'react'
+import { login } from '../api.js'
 
-export default function Login({ role, onSuccess, onBack }) {
-  const [list, setList] = useState([])
-  const [selectedId, setSelectedId] = useState('')
-  const [manualId, setManualId] = useState('')
-  const [loading, setLoading] = useState(true)
+export default function Login({ role, onSuccess, onBack, onRegister }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      setLoading(true)
-      setError(null)
-      try {
-        const rows = role === 'customer' ? await getCustomers() : await getEmployees()
-        if (!cancelled) setList(Array.isArray(rows) ? rows : [])
-      } catch (e) {
-        if (!cancelled) setError(e.message || 'Failed to load list')
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    load()
-    return () => {
-      cancelled = true
-    }
-  }, [role])
-
-  useEffect(() => {
-    if (selectedId) setManualId(selectedId)
-  }, [selectedId])
+  const title = role === 'customer' ? 'Customer Login' : 'Employee Login'
 
   async function handleSubmit(e) {
     e.preventDefault()
-    const raw = manualId.trim() || selectedId
-    const id = parseInt(raw, 10)
-    if (Number.isNaN(id) || id <= 0) {
-      setError('Enter a valid ID')
+    if (!email.trim()) {
+      setError('Email is required')
+      return
+    }
+    if (!password) {
+      setError('Password is required')
       return
     }
     setSubmitting(true)
     setError(null)
     try {
+      const result = await login(role, email.trim(), password)
+      // result: { role, profile }
       if (role === 'customer') {
-        const customer = await getCustomer(id)
-        onSuccess({ role: 'customer', customer_id: customer.customer_id, profile: customer })
+        onSuccess({
+          role: 'customer',
+          customer_id: result.profile.customer_id,
+          profile: result.profile,
+        })
       } else {
-        const employee = await getEmployee(id)
-        onSuccess({ role: 'employee', employee_id: employee.employee_id, profile: employee })
+        onSuccess({
+          role: 'employee',
+          employee_id: result.profile.employee_id,
+          profile: result.profile,
+        })
       }
     } catch (err) {
       setError(err.message || 'Login failed')
@@ -58,57 +44,52 @@ export default function Login({ role, onSuccess, onBack }) {
     }
   }
 
-  const title = role === 'customer' ? 'Customer login' : 'Employee login'
-  const idField = role === 'customer' ? 'customer_id' : 'employee_id'
-
   return (
     <div className="narrow-page">
       <button type="button" className="link-back" onClick={onBack}>
         ← Back
       </button>
       <h1>{title}</h1>
-      <p className="subtle">Choose an existing account or enter an {idField}.</p>
+      <p className="subtle">Sign in with your email and password.</p>
 
-      {loading && <p className="subtle">Loading…</p>}
       {error && <p className="msg msg-error">{error}</p>}
 
       <form className="stack-form" onSubmit={handleSubmit}>
         <label>
-          Account
-          <select
-            value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
-            disabled={loading || list.length === 0}
-          >
-            <option value="">— Select —</option>
-            {list.map((row) => {
-              const id = row[idField]
-              const label = `${id} — ${row.first_name} ${row.last_name}`
-              return (
-                <option key={id} value={String(id)}>
-                  {label}
-                </option>
-              )
-            })}
-          </select>
-        </label>
-        <label>
-          {idField}
+          Email
           <input
-            type="number"
-            min="1"
-            value={manualId}
-            onChange={(e) => {
-              setManualId(e.target.value)
-              setSelectedId('')
-            }}
-            placeholder="e.g. 1"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            autoComplete="email"
+            required
           />
         </label>
-        <button type="submit" disabled={submitting || loading}>
+        <label>
+          Password
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            autoComplete="current-password"
+            required
+          />
+        </label>
+        <button type="submit" disabled={submitting}>
           {submitting ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
+
+      {onRegister && (
+        <p className="subtle" style={{ marginTop: '1rem', textAlign: 'center' }}>
+          No account?{' '}
+          <button type="button" className="link-back" onClick={onRegister}>
+            Register here
+          </button>
+        </p>
+      )}
     </div>
   )
 }
