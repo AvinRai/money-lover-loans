@@ -110,9 +110,52 @@ class ReviewApplication(BaseModel):
     denial_reason: str | None = None
 
 
+class LoginRequest(BaseModel):
+    role: str  # 'customer' or 'employee'
+    email: str
+    password: str
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+### AUTH ENDPOINTS ###
+
+
+@app.post("/auth/login")
+def login(body: LoginRequest):
+    if body.role not in ("customer", "employee"):
+        raise HTTPException(status_code=400, detail="role must be 'customer' or 'employee'")
+
+    if body.role == "customer":
+        user = fetch_one(
+            """
+            SELECT customer_id, first_name, last_name, email, phone, home_address,
+                   balance, salary, credit_score, hashed_password
+            FROM Customers
+            WHERE email = %s
+            """,
+            (body.email,),
+        )
+        if not user or user["hashed_password"] != body.password:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        profile = {k: v for k, v in user.items() if k != "hashed_password"}
+        return {"role": "customer", "profile": profile}
+
+    user = fetch_one(
+        """
+        SELECT employee_id, first_name, last_name, email, phone, home_address, hashed_password
+        FROM Employees
+        WHERE email = %s
+        """,
+        (body.email,),
+    )
+    if not user or user["hashed_password"] != body.password:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    profile = {k: v for k, v in user.items() if k != "hashed_password"}
+    return {"role": "employee", "profile": profile}
 
 
 ### CUSTOMER ENDPOINTS ###
@@ -197,6 +240,10 @@ def delete_customer(customer_id: int):
     if not fetch_customer(customer_id):
         raise HTTPException(status_code=404, detail="Customer not found")
 
+    # Cascade: payments → loans → loan applications → customer
+    execute("DELETE FROM Payments WHERE customer_id = %s", (customer_id,))
+    execute("DELETE FROM Loans WHERE customer_id = %s", (customer_id,))
+    execute("DELETE FROM LoanApplications WHERE customer_id = %s", (customer_id,))
     delete_record("Customers", "customer_id", customer_id)
 
     return {"message": "Customer deleted successfully"}
@@ -570,15 +617,8 @@ def delete_loan(loan_id: int):
     if not fetch_loan(loan_id):
         raise HTTPException(status_code=404, detail="Loan not found")
 
-    payments = fetch_one(
-        "SELECT payment_id FROM Payments WHERE loan_id = %s LIMIT 1",
-        (loan_id,),
-    )
-    if payments:
-        raise HTTPException(
-            status_code=400, detail="Cannot delete loan with recorded payments"
-        )
-
+    # Cascade: delete payments before deleting the loan
+    execute("DELETE FROM Payments WHERE loan_id = %s", (loan_id,))
     delete_record("Loans", "loan_id", loan_id)
 
     return {"message": "Loan deleted successfully"}
